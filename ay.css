@@ -121,7 +121,8 @@ h1, h2, h3, h4, h5, h6, p{
     text-align: center;
     margin: 2em;
 }
-.y-post-comment-section textarea, .y-post-comment-section input{
+.y-post-comment-section textarea, .y-post-comment-section input, 
+    .y-edit-comment-form textarea, .y-edit-comment-form input{
     width: 80%;
     padding: 1em;
 }

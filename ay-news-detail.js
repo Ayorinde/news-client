@@ -9,6 +9,7 @@ window.addEventListener("load", async () => {
     let nextImgBtn = document.querySelector('.y-next-img');
     let app = document.getElementById('y-app');
     let postCommentBtn = document.getElementById('post-comment');
+    let postEditCommentBtn = document.getElementById('post-edit-comment-btn')
 
 
     let winLocation = window.location.search;
@@ -21,9 +22,11 @@ window.addEventListener("load", async () => {
     let commentsUrl = `${baseUrl}/news/${docId}/comments`
     let imgPostUrl = `${baseUrl}/news/${docId}/images`
     let commentPostUrl = `${baseUrl}/news/${docId}/comments`
+    let editCommentUrl = `${baseUrl}/news/${docId}/comments/`
 
     let img2display = 0;
     let imgsArray = [];
+    let theCommentId = 0;
 
     let allNewsData = await getAllNewsData();
     console.log('done getting all data ');
@@ -68,6 +71,32 @@ window.addEventListener("load", async () => {
         img2display++;
         displayImg(imgsArray);
     })
+    //post-edit-comment-btn
+    listUl.addEventListener('click', async function (e) {
+        let target = e.target;
+        console.log('target: ', target.id);
+        if (target.id === 'post-edit-comment-btn') {
+            e.preventDefault();
+            console.log('yeah it is the btn')
+            let commentElem = document.querySelector('.y-edit-comment-form #comment');
+            let comment = commentElem.value;
+
+            console.log('commentId from dataset: ', theCommentId)
+            let durl = `${editCommentUrl}/${theCommentId}`;
+            let commentEditted = await editComment({ comment }, durl)
+            console.log('editted comment...: ', commentEditted);
+        }
+        if (target.id === 'edit-comment') {
+            console.log('it is the edit btn yo! ');
+            let commentForm = document.querySelector('.y-edit-comment-form');
+            commentForm.classList.remove('y-hide');
+
+
+        }
+
+        e.preventDefault();
+        console.log('post-edit-comment ')
+    })
 
 
     //https://i1.wp.com/thefreshimages.com/wp-content/uploads/2018/06/lord-shiva-images-39.jpg
@@ -77,11 +106,28 @@ window.addEventListener("load", async () => {
 
         commentArray.forEach(item => {
             let li = document.createElement('li');
+            theCommentId = item.id;
             let html = `
                 
                     <div>
                         <h4>${item.comment}</h4>
                         <p>by ${item.name}</p>
+                        <p>
+                          <button class='edit-comment' id='edit-comment'> edit comment</button>
+                          <button class='delete-comment' id='delete-comment'> delete </button>
+                        </p>
+                        
+                        <form action="" method="post" class="y-edit-comment-form y-hide">
+                        <div>
+                            <textarea name="comment" id="comment" cols="30" rows="10" placeholder="your comment" data-commentid="${item.id}">
+                            ${item.comment}/${item.id}
+                            </textarea>
+                            <input id="commentId" hidden="true" value=${item.id} />
+                        </div>
+        
+                        <button id="post-edit-comment-btn">submit</button>
+                    </form>
+        
                     </div>
                 
             `
@@ -124,13 +170,19 @@ window.addEventListener("load", async () => {
 
 
     async function addImage(imageUrl, newsId, imgPostUrl) {
-        let images = await fetch(imagesUrl);
+        let images = await fetch(imagesUrl, { method: "POST", body: imgPostUrl });
         return images;
     }
 
     async function addComment(commentData, newsId, commentPostUrl) {
         let comment = await fetch(commentPostUrl, { method: "POST", body: JSON.stringify(commentData) });
         console.log('comment from post: ', comment.ok);
+        return comment.ok;
+    }
+
+    async function editComment(commentData, editCommentUrl) {
+        let comment = await fetch(editCommentUrl, { method: "PUT", body: JSON.stringify(commentData) });
+        console.log('comment edited: ', comment.ok);
         return comment.ok;
     }
 
