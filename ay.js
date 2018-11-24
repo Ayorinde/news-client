@@ -34,7 +34,15 @@ window.addEventListener("load", async () => {
 
 
     async function getTheNews(baseUrl, pageNo, listLimit) {
-        let news = await getAllNews(`${baseUrl}/news?page=${pageNo}&limit=${listLimit}`);
+        let news;
+        try {
+            news = await getAllNews(`${baseUrl}/news?page=${pageNo}&limit=${listLimit}`);
+
+        } catch (error) {
+            console.log('error getting all the news list : ', error.message);
+
+        }
+
         console.log(JSON.stringify(news, null, 4));
 
         news.forEach(item => {
@@ -56,7 +64,15 @@ window.addEventListener("load", async () => {
 
     async function getAllNews(url) {
         let loadingTag = loading(statusElem);
-        let newsRaw = await fetch(url);
+
+        let newsRaw;
+        try {
+            newsRaw = await fetch(url);
+
+        } catch (error) {
+            console.log('error getting news data: ', error.message);
+
+        }
 
         let news = newsRaw.json();
 

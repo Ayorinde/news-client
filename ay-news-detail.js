@@ -168,7 +168,7 @@ window.addEventListener("load", async () => {
 
 
 
-
+    //all the awaits in these functions should actually be in a try catch
     async function addImage(imageUrl, newsId, imgPostUrl) {
         let images = await fetch(imagesUrl, { method: "POST", body: imgPostUrl });
         return images;
