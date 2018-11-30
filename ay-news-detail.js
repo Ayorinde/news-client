@@ -3,13 +3,14 @@ window.addEventListener("load", async () => {
     let baseUrl = "https://5bee92827839000013e6faed.mockapi.io/clane/api/v2";
     let statusElem = document.getElementById('loading');
     let listUl = document.getElementById('list-ul');
+    let listUlLi = document.querySelector('list-ul li');
     let listUlImgs = document.getElementById('list-ul-imgs');
     let imgsSection = document.querySelector('.y-images-section');
     let prevImgBtn = document.querySelector('.y-prev-img');
     let nextImgBtn = document.querySelector('.y-next-img');
     let app = document.getElementById('y-app');
     let postCommentBtn = document.getElementById('post-comment');
-    let postEditCommentBtn = document.getElementById('post-edit-comment-btn')
+    let postEditCommentBtn = document.querySelector('.post-edit-comment-btn')
 
 
     let winLocation = window.location.search;
@@ -22,7 +23,7 @@ window.addEventListener("load", async () => {
     let commentsUrl = `${baseUrl}/news/${docId}/comments`
     let imgPostUrl = `${baseUrl}/news/${docId}/images`
     let commentPostUrl = `${baseUrl}/news/${docId}/comments`
-    let editCommentUrl = `${baseUrl}/news/${docId}/comments/`
+    let editCommentUrl = `${baseUrl}/news/${docId}/comments`
 
     let img2display = 0;
     let imgsArray = [];
@@ -60,6 +61,10 @@ window.addEventListener("load", async () => {
 
     }, false)
 
+
+
+
+
     prevImgBtn.addEventListener('click', function (e) {
         e.preventDefault();
         img2display--;
@@ -75,28 +80,71 @@ window.addEventListener("load", async () => {
     listUl.addEventListener('click', async function (e) {
         let target = e.target;
         console.log('target: ', target.id);
-        if (target.id === 'post-edit-comment-btn') {
-            e.preventDefault();
-            console.log('yeah it is the btn')
-            let commentElem = document.querySelector('.y-edit-comment-form #comment');
-            let comment = commentElem.value;
+        console.log('this: ', this.className);
+        console.dir(this);
 
-            console.log('commentId from dataset: ', theCommentId)
-            let durl = `${editCommentUrl}/${theCommentId}`;
-            let commentEditted = await editComment({ comment }, durl)
-            console.log('editted comment...: ', commentEditted);
+        console.log('this.child.tagName: ', e.target.tagName);
+        console.dir(this.childNodes)
+        let dchildNodes = this.childNodes;
+
+
+        for (let child in dchildNodes) {
+            console.log('child: ', dchildNodes[child]);
+            //console.dir(child)
+
+
+            console.log('indx: ', child);
+            dchildNodes[child].addEventListener('click', async function (e) {
+                console.log('a child clicked!')
+                console.log(this)
+                let commentElement = this.querySelector('.y-edit-comment-form #comment');
+                let comment = commentElement.value;
+                console.log('comment: ', comment);
+                console.log('the target className: ', e.target.className)
+                if (target.className === 'edit-comment') {
+
+                    console.log('it is the edit btn yo! ');
+                    console.dir(target);
+                    let commentForm = this.querySelector('.y-edit-comment-form');
+                    commentForm.classList.remove('y-hide');
+
+
+                }
+
+                if (e.target.className === 'post-edit-comment-btn') {
+                    e.preventDefault();
+                    console.log('yeah it is the btn')
+                    let commentElem = this.querySelector('.y-edit-comment-form #comment');
+                    let comment = commentElem.value;
+                    console.log('comment here: ', comment);
+
+                    console.log('commentId from dataset: ', theCommentId)
+                    let durl = `${editCommentUrl}/${theCommentId}`;
+                    let commentEditted = await editComment({ comment }, durl)
+                    console.log('editted comment...: ', commentEditted);
+                }
+            })
         }
-        if (target.id === 'edit-comment') {
-            console.log('it is the edit btn yo! ');
-            let commentForm = document.querySelector('.y-edit-comment-form');
-            commentForm.classList.remove('y-hide');
 
-
-        }
+        // if (target.className === 'edit-comment') {
+        //     console.log('it is the edit btn yo! ');
+        //     console.log('target.classname: ', target.className);
+        //     console.dir(target);
+        //     let commentForm = document.querySelector('.y-edit-comment-form');
+        //     commentForm.classList.remove('y-hide');
+        // }
 
         e.preventDefault();
         console.log('post-edit-comment ')
     })
+
+    // listUlLi.addEventListener('click', async function (e) {
+    //     let target = e.target;
+    //     console.log('listUlLi target: ', target.id);
+    //     console.log('li this: ', this.className);
+    //     console.dir(this);
+
+    // })
 
 
     //https://i1.wp.com/thefreshimages.com/wp-content/uploads/2018/06/lord-shiva-images-39.jpg
@@ -113,7 +161,7 @@ window.addEventListener("load", async () => {
                         <h4>${item.comment}</h4>
                         <p>by ${item.name}</p>
                         <p>
-                          <button class='edit-comment' id='edit-comment'> edit comment</button>
+                          <button class='edit-comment' id='edit-comment' > edit comment</button>
                           <button class='delete-comment' id='delete-comment'> delete </button>
                         </p>
                         
@@ -125,7 +173,7 @@ window.addEventListener("load", async () => {
                             <input id="commentId" hidden="true" value=${item.id} />
                         </div>
         
-                        <button id="post-edit-comment-btn">submit</button>
+                        <button id="post-edit-comment-btn" class="post-edit-comment-btn">submit</button>
                     </form>
         
                     </div>
@@ -168,7 +216,7 @@ window.addEventListener("load", async () => {
 
 
 
-    //all the awaits in these functions should actually be in a try catch
+    //all the awaits in these functions should actually be in a TRY CATCH
     async function addImage(imageUrl, newsId, imgPostUrl) {
         let images = await fetch(imagesUrl, { method: "POST", body: imgPostUrl });
         return images;
@@ -181,6 +229,7 @@ window.addEventListener("load", async () => {
     }
 
     async function editComment(commentData, editCommentUrl) {
+        console.log('the edit comment url : ', editCommentUrl);
         let comment = await fetch(editCommentUrl, { method: "PUT", body: JSON.stringify(commentData) });
         console.log('comment edited: ', comment.ok);
         return comment.ok;

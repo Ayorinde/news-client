@@ -59,8 +59,13 @@ h1, h2, h3, h4, h5, h6, p{
 .y-list-item-link{
     text-decoration: none;
 }
-.y-app .y-list-section a:hover div{
+.y-app .y-list-section li:hover {
     background-color: #f8f4f4; /* #f1e1e1; z */
+}
+
+.y-app .hover{
+    background-color: #d0ecca; 
+
 }
 
 
@@ -79,7 +84,7 @@ h1, h2, h3, h4, h5, h6, p{
     color: #4b4242;
 }
 .y-nav-next a:nth-child(2){
-    color: red;
+    
     float: right;
 }
 #loading{
